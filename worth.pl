@@ -15,12 +15,12 @@ use constant ONE_MILLION_DOLLARS => 1000000;
 my %opts;
 my ($ticker, $help, $usage, $value, $source);
 %opts = GetOptions(
-      "ticker=s" => \$ticker,
-      "help"     => \$help,
-      "usage"    => \$usage,
-      "value=s"  => \$value,
-      "source=s" => \$source,
-    );
+    "ticker=s" => \$ticker,
+    "help"     => \$help,
+    "usage"    => \$usage,
+    "value=s"  => \$value,
+    "source=s" => \$source,
+);
 
 # Validate required options
 unless ($ticker) {
@@ -36,24 +36,24 @@ my $vested_shares = 100;
 # 'YYYY-MM-DD' => number of shares,
 # 'YYYY-MM-DD' => number of shares,
 my %vesting_map = (
-  '2011-05-15' => 100,
-  '2011-11-15' => 100,
-    );
+    '2011-05-15' => 100,
+    '2011-11-15' => 100,
+);
 
 # Party time.
 exit main();
 
 sub main {
-   # Just in case our user is lazy
+    # Just in case our user is lazy
     $ticker = uc($ticker);
 
     my $quote = 0.00;
 
-       # Playtime scenario
+    # Playtime scenario
     if ($value && $value > 0) {
 	$quote = $value;
 
-   # Load the quote information from tha interwebs
+    # Load the quote information from tha interwebs
     } else {
 	if ($source eq 'google') {
 	    print "Checking Google...\n";
@@ -66,12 +66,12 @@ sub main {
 	}
     }
 
-   # Easy part: vested shares times quote = value of vested shares.
+    # Easy part: vested shares times quote = value of vested shares.
     my $vested_worth = $vested_shares * $quote;
     print "Let's start with the good news:\n\n";
     printf "\tYou currently own %s shares worth %s.\n", $vested_shares, format_usd($vested_worth);
 
-   # First add up the total unvested value.
+    # First add up the total unvested value.
     my $total_unvested = 0.00;
     my $unvested_shares = 0;
     foreach my $shares (values %vesting_map) {
@@ -80,35 +80,35 @@ sub main {
     }
 
     print "\nNow for the bad news.\n\n";
-       printf "At today's stock price of %s, you'll walk away from %s:\n\n", format_usd($quote),
+    printf "At today's stock price of %s, you'll walk away from %s:\n\n", format_usd($quote),
     format_usd($total_unvested);
 
-   # Then subtract the value of each vesting date from the total unvested.
+    # Then subtract the value of each vesting date from the total unvested.
     foreach my $vesting_date (sort {$a cmp $b} keys %vesting_map) {
 	printf "\tIf you quit before %s, you'll lose %s.\n", $vesting_date, format_usd($total_unvested);
-               $total_unvested = $total_unvested - ($vesting_map{$vesting_date} * $quote);
-       }
+        $total_unvested = $total_unvested - ($vesting_map{$vesting_date} * $quote);
+    }
 
-   # millionaire - both based on today's vested & if you make it to the end.
-   # No point doing this if the user is already a fucking bastard millionaire.
-       if ($vested_worth < ONE_MILLION_DOLLARS) {
-               print "\nWanna be a millionaire?\n\n";
+    # millionaire - both based on today's vested & if you make it to the end.
+    # No point doing this if the user is already a fucking bastard millionaire.
+    if ($vested_worth < ONE_MILLION_DOLLARS) {
+       print "\nWanna be a millionaire?\n\n";
 
-               my $today_mil_quote = ONE_MILLION_DOLLARS / $vested_shares;
-               printf "\tIf you quit today, you would need $ticker to be at %s.\n", format_usd($today_mil_quote);
+       my $today_mil_quote = ONE_MILLION_DOLLARS / $vested_shares;
+       printf "\tIf you quit today, you would need $ticker to be at %s.\n", format_usd($today_mil_quote);
 
-               my $later_mil_quote = ONE_MILLION_DOLLARS / ($unvested_shares + $vested_shares);
-               printf "\tIf you make it to the end, you need $ticker to be at %s.\n", format_usd($later_mil_quote);
+       my $later_mil_quote = ONE_MILLION_DOLLARS / ($unvested_shares + $vested_shares);
+       printf "\tIf you make it to the end, you need $ticker to be at %s.\n", format_usd($later_mil_quote);
 
-               printf "\tToday, unfortunately, $ticker is at %s\n\n", format_usd($quote);
-       }
+       printf "\tToday, unfortunately, $ticker is at %s\n\n", format_usd($quote);
+    }
 
-   # now this is just cheeky
-       if ($vested_worth >= ONE_MILLION_DOLLARS        ) {
-               print "\nYOU MADE IT! Now go live your live of leisure and luxury!\n";
-       } else {
-               print "Keep on workin'. Hang in there, little buddy...you'll make it eventually!\n";
-       }
+    # now this is just cheeky
+    if ($vested_worth >= ONE_MILLION_DOLLARS        ) {
+       print "\nYOU MADE IT! Now go live your live of leisure and luxury!\n";
+    } else {
+       print "Keep on workin'. Hang in there, little buddy...you'll make it eventually!\n";
+    }  
 }
 
 #
@@ -118,13 +118,13 @@ sub main {
 sub format_usd {
     my $number = sprintf "%.2f", shift @_;
 
-      # Add one comma each time through the do-nothing loop
-      1 while $number =~ s/^(-?\d+)(\d\d\d)/$1,$2/;
+    # Add one comma each time through the do-nothing loop
+    1 while $number =~ s/^(-?\d+)(\d\d\d)/$1,$2/;
 
-      # Put the dollar sign in the right place
-      $number =~ s/^(-?)/$1\$/;
+    # Put the dollar sign in the right place
+    $number =~ s/^(-?)/$1\$/;
 
-      return $number;
+    return $number;
 }
 
 #
@@ -133,12 +133,12 @@ sub format_usd {
 sub get_raw_html_from_google {
     my $ticker = shift;
 
-   # Mobile site should be easier to parse
+    # Mobile site should be easier to parse
     my $base_url = 'http://www.google.com/m/?q=';
     my $url = $base_url.$ticker;
 
-   # Putting these into their own subroutines
-   # in case I need to do anything sophisticated.
+    # Putting these into their own subroutines
+    # in case I need to do anything sophisticated.
     my $ua = _get_user_agent();
     my $request = _make_request($url);
 
@@ -188,8 +188,8 @@ sub parse_google_html {
 	$quote = $1;
     }
 
-   # if we got a successful quote, prune it further.
-   # There is likely a more elegant way to do this.
+    # if we got a successful quote, prune it further.
+    # There is likely a more elegant way to do this.
     if ($quote ne '0.00') {
 	$quote =~ s/\<br\/>//g;
 	my $quote_to_return;
