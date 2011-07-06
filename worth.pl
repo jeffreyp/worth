@@ -180,10 +180,10 @@ sub parse_google_html {
     my $html = shift;
     my $quote = '0.00';
 
-   # <br/>Xn.Xn +/-Xn.Xn (+/-Xn.Xn%) <br/>
-   # <br/>135.54 -0.95 (-0.70%) <br/>
-   # <br/>127.94 +0.59 (0.46%) <br/>
-       # Here be dragons:
+    # <br/>Xn.Xn +/-Xn.Xn (+/-Xn.Xn%) <br/>
+    # <br/>135.54 -0.95 (-0.70%) <br/>
+    # <br/>127.94 +0.59 (0.46%) <br/>
+    # Here be dragons:
     if ($html =~ /(\<br\/\>\d+\.\d+\s(\+|\-)\d+\.\d+\s\((\-?)\d+\.\d+\%\)\s\<br\/>)/g ) {
 	$quote = $1;
     }
