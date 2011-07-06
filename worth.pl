@@ -6,8 +6,6 @@
 
 use strict;
 
-use Data::Dumper;
-use Date::Calc;
 use Getopt::Long qw(GetOptions);
 use LWP::UserAgent;
 
