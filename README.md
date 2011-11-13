@@ -26,4 +26,5 @@ currently held, and your vesting schedule.
 These shouldn't cause any issues, but FYI nonetheless.
 
 Getopt::Long
+
 libwww-perl (for LWP::UserAgent)
