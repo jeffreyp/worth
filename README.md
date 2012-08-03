@@ -5,15 +5,13 @@ Has anyone employed at a dot com NOT written a variant of this script?
 ## Usage
 
 Usage:
-  worth.pl --ticker=[ticker symbol] --value=x.xx --source=[google|yahoo]
+  worth.pl --ticker=[ticker symbol] --value=x.xx
 
 ## Notes
 
 Given a stock ticker symbol, scrape the current price from
-Yahoo/Google and figure out how much money you'd walk away from if you
+Yahoo and figure out how much money you'd walk away from if you
 quit.
-
-Yahoo is the default. Google isn't working as of now.
 
 Value is an optional parameter that will probably just make you feel bad.
 
