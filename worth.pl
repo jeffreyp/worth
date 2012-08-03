@@ -19,7 +19,6 @@ my ($ticker, $help, $usage, $value, $source);
     "help"     => \$help,
     "usage"    => \$usage,
     "value=s"  => \$value,
-    "source=s" => \$source,
 );
 
 # Validate required options
@@ -51,19 +50,11 @@ sub main {
 
     # Playtime scenario
     if ($value && $value > 0) {
-	$quote = $value;
+		$quote = $value;
 
     # Load the quote information from tha interwebs
     } else {
-	if ($source eq 'google') {
-	    print "Checking Google...\n";
-	    my $html = get_raw_html_from_google($ticker);
-	    $quote = parse_google_html($html);
-	} else {
-	    print "Checking Yahoo...\n";
-	    my $html = get_raw_html_from_yahoo($ticker);
-	    $quote = parse_yahoo_html($html);
-	}
+		$quote = get_csv($ticker);
     }
 
     # Easy part: vested shares times quote = value of vested shares.
@@ -75,8 +66,8 @@ sub main {
     my $total_unvested = 0.00;
     my $unvested_shares = 0;
     foreach my $shares (values %vesting_map) {
-	$total_unvested = $total_unvested + ($shares * $quote);
-	$unvested_shares = $unvested_shares + $shares;
+		$total_unvested = $total_unvested + ($shares * $quote);
+		$unvested_shares = $unvested_shares + $shares;
     }
 
     print "\nNow for the bad news.\n\n";
@@ -128,36 +119,13 @@ sub format_usd {
 }
 
 #
-# Get the raw html from Google but don't do any parsing.
+# Yahoo Finance provides a simple CSV interface
+# http://www.gummy-stuff.org/Yahoo-data.htm
 #
-sub get_raw_html_from_google {
+sub get_csv {
     my $ticker = shift;
 
-    # Mobile site should be easier to parse
-    my $base_url = 'http://www.google.com/m/?q=';
-    my $url = $base_url.$ticker;
-
-    # Putting these into their own subroutines
-    # in case I need to do anything sophisticated.
-    my $ua = _get_user_agent();
-    my $request = _make_request($url);
-
-    my $result = $ua->request($request);
-
-    if ($result->is_success) {
-	return $result->content;
-    } else {
-	print "An error occurred while accessing Google:\n";
-	print $result->status_line, "\n";
-	exit;
-    }
-}
-
-sub get_raw_html_from_yahoo {
-    my $ticker = shift;
-
-    my $base_url = 'http://m.yahoo.com/w/yfinance/quote/';
-    my $url = $base_url.$ticker;
+    my $url = 'http://download.finance.yahoo.com/d/quotes.csv?s='.$ticker.'&f=l1';
 
     my $ua = _get_user_agent();
     my $request = _make_request($url);
@@ -165,53 +133,12 @@ sub get_raw_html_from_yahoo {
     my $result = $ua->request($request);
 
     if ($result->is_success) {
-	return $result->content;
+		return $result->content;
     } else {
-	print "An error occurred while accessing Yahoo:\n";
-	print $result->status_line, "\n";
+		print "An error occurred while accessing Yahoo:\n";
+		print $result->status_line, "\n";
 	exit;
     }
-}
-
-#
-# This is where the magic happens. Or something.
-#
-sub parse_google_html {
-    my $html = shift;
-    my $quote = '0.00';
-
-    # <br/>Xn.Xn +/-Xn.Xn (+/-Xn.Xn%) <br/>
-    # <br/>135.54 -0.95 (-0.70%) <br/>
-    # <br/>127.94 +0.59 (0.46%) <br/>
-    # Here be dragons:
-    if ($html =~ /(\<br\/\>\d+\.\d+\s(\+|\-)\d+\.\d+\s\((\-?)\d+\.\d+\%\)\s\<br\/>)/g ) {
-	$quote = $1;
-    }
-
-    # if we got a successful quote, prune it further.
-    # There is likely a more elegant way to do this.
-    if ($quote ne '0.00') {
-	$quote =~ s/\<br\/>//g;
-	my $quote_to_return;
-	if ($quote =~ /(^\d+\.\d+)\s./) {
-	    $quote_to_return = $1;
-	    $quote = $quote_to_return;
-	}
-    }
-
-    return $quote;
-}
-
-sub parse_yahoo_html {
-    my $html = shift;
-    my $quote = '0.00';
-
-    # <span class="w"><b>157.78</b></span>
-    if ($html =~ /(\<span class\=\"w\"\>\<b\>(\d+\.\d+)\<\/b\>\<\/span\>)/g ) {
-	$quote = $2;
-    }
-
-    return $quote;
 }
 
 sub _get_user_agent {
