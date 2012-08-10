@@ -15,17 +15,10 @@ use constant ONE_MILLION_DOLLARS => 1000000;
 my %opts;
 my ($ticker, $help, $usage, $value);
 %opts = GetOptions(
-<<<<<<< HEAD
-    "ticker=s" => \$ticker,
-    "help"     => \$help,
-    "usage"    => \$usage,
-    "value=s"  => \$value,
-=======
        "ticker=s" => \$ticker,
        "help"     => \$help,
        "usage"    => \$usage,
        "value=s"  => \$value,
->>>>>>> Further simplifications.
 );
 
 # Validate required options
@@ -54,82 +47,69 @@ exit main();
 
 sub main {
     # Just in case our user is lazy
-	$ticker = uc($ticker);
+    $ticker = uc($ticker);
 
-	my $quote = 0.00; 
+    my $quote = 0.00; 
 
-<<<<<<< HEAD
     # Playtime scenario
     if ($value && $value > 0) {
-		$quote = $value;
+	$quote = $value;
 
     # Load the quote information from tha interwebs
     } else {
-		$quote = get_csv($ticker);
+	$quote = get_csv($ticker);
     }
-=======
-	# Playtime scenario
-	if ($value && $value > 0) {
-		$quote = $value;
-
-    # Load the quote information from tha interwebs
-	} else {
-		$quote = get_csv($ticker);
-	}
->>>>>>> Further simplifications.
 
     # Easy part: vested shares times quote = value of vested shares.
-	my $vested_worth = $vested_shares * $quote;
-	print "Let's start with the good news:\n\n";
-	printf "\tYou currently own %s shares worth %s.\n", $vested_shares, format_usd($vested_worth);
+    my $vested_worth = $vested_shares * $quote;
+    print "Let's start with the good news:\n\n";
+    printf "\tYou currently own %s shares worth %s.\n", 
+        $vested_shares, format_usd($vested_worth);
 
     # First add up the total unvested value.
-<<<<<<< HEAD
     my $total_unvested = 0.00;
     my $unvested_shares = 0;
     foreach my $shares (values %vesting_map) {
-		$total_unvested = $total_unvested + ($shares * $quote);
-		$unvested_shares = $unvested_shares + $shares;
+	$total_unvested = $total_unvested + ($shares * $quote);
+	$unvested_shares = $unvested_shares + $shares;
     }
-=======
-	my $total_unvested = 0.00;
-	my $unvested_shares = 0;
-	foreach my $shares (values %vesting_map) {
-		$total_unvested = $total_unvested + ($shares * $quote);
-		$unvested_shares = $unvested_shares + $shares;
-	}
->>>>>>> Further simplifications.
 
-	print "\nNow for the bad news.\n\n";
-	printf "At today's stock price of %s, you'll walk away from %s:\n\n", format_usd($quote), 
-	        format_usd($total_unvested);
+    print "\nNow for the bad news.\n\n";
+    printf "At today's stock price of %s, you'll walk away from %s:\n\n", 
+        format_usd($quote), format_usd($total_unvested);
 
     # Then subtract the value of each vesting date from the total unvested.
-	foreach my $vesting_date (sort {$a cmp $b} keys %vesting_map) {
-		printf "\tIf you quit before %s, you'll lose %s.\n", $vesting_date, format_usd($total_unvested);
-		$total_unvested = $total_unvested - ($vesting_map{$vesting_date} * $quote);
-	}
+    foreach my $vesting_date (sort {$a cmp $b} keys %vesting_map) {
+	printf "\tIf you quit before %s, you'll lose %s.\n", 
+	    $vesting_date, format_usd($total_unvested);
+	$total_unvested = 
+            $total_unvested - ($vesting_map{$vesting_date} * $quote);
+    }
 
     # millionaire - both based on today's vested & if you make it to the end.
     # No point doing this if the user is already a fucking bastard millionaire.
-	if ($vested_worth < ONE_MILLION_DOLLARS) {
-		print "\nWanna be a millionaire?\n\n";
+    if ($vested_worth < ONE_MILLION_DOLLARS) {
+	print "\nWanna be a millionaire?\n\n";
 
-		my $today_mil_quote = ONE_MILLION_DOLLARS / $vested_shares;
-		printf "\tIf you quit today, you would need $ticker to be at %s.\n", format_usd($today_mil_quote);
+	my $today_mil_quote = ONE_MILLION_DOLLARS / $vested_shares;
+	printf "\tIf you quit today, you would need $ticker to be at %s.\n", 
+            format_usd($today_mil_quote);
 
-		my $later_mil_quote = ONE_MILLION_DOLLARS / ($unvested_shares + $vested_shares);
-		printf "\tIf you make it to the end, you need $ticker to be at %s.\n", format_usd($later_mil_quote);
+	my $later_mil_quote = 
+            ONE_MILLION_DOLLARS / ($unvested_shares + $vested_shares);
+	printf "\tIf you make it to the end, you need $ticker to be at %s.\n", 
+            format_usd($later_mil_quote);
 
-		printf "\tToday, unfortunately, $ticker is at %s\n\n", format_usd($quote);
-	}
+	printf "\tToday, unfortunately, $ticker is at %s\n\n", 
+            format_usd($quote);
+    }
 
     # now this is just cheeky
-	if ($vested_worth >= ONE_MILLION_DOLLARS        ) {
-		print "\nYOU MADE IT! Now go live your live of leisure and luxury!\n";
-	} else {
-		print "Keep on workin'. Hang in there, little buddy...you'll make it eventually!\n";
-	}
+    if ($vested_worth >= ONE_MILLION_DOLLARS        ) {
+	print "\nYOU MADE IT! Now go live your live of leisure and luxury!\n";
+    } else {
+	print "Keep on workin'. Hang in there, little buddy...you'll make it eventually!\n";
+    }
 }
 
 #
@@ -137,19 +117,18 @@ sub main {
 # http://vishnuagrawal.blogspot.com/2008/10/perl-formatting-number-to-currency.html
 #
 sub format_usd {
-	my $number = sprintf "%.2f", shift @_;
+    my $number = sprintf "%.2f", shift @_;
 
-       # Add one comma each time through the do-nothing loop
-       1 while $number =~ s/^(-?\d+)(\d\d\d)/$1,$2/;
+    # Add one comma each time through the do-nothing loop
+    1 while $number =~ s/^(-?\d+)(\d\d\d)/$1,$2/;
 
-       # Put the dollar sign in the right place
-       $number =~ s/^(-?)/$1\$/;
+    # Put the dollar sign in the right place
+    $number =~ s/^(-?)/$1\$/;
 
-       return $number;
+    return $number;
 }
 
 #
-<<<<<<< HEAD
 # Yahoo Finance provides a simple CSV interface
 # http://www.gummy-stuff.org/Yahoo-data.htm
 #
@@ -164,36 +143,12 @@ sub get_csv {
     my $result = $ua->request($request);
 
     if ($result->is_success) {
-		return $result->content;
+	return $result->content;
     } else {
-		print "An error occurred while accessing Yahoo:\n";
+	print "An error occurred while accessing Yahoo:\n";
 		print $result->status_line, "\n";
 	exit;
     }
-=======
-# Yahoo provides a simple CSV interface.
-# http://www.gummy-stuff.org/Yahoo-data.htm
-#
-sub get_csv {
-	my $ticker = shift;
-
-	my $url = 'http://download.finance.yahoo.com/d/quotes.csv?s='.$ticker.'&f=l1';
-
-    # Putting these into their own subroutines
-    # in case I need to do anything sophisticated.
-	my $ua = _get_user_agent();
-	my $request = _make_request($url);
-
-	my $result = $ua->request($request);
-
-	if ($result->is_success) {
-		return $result->content;
-	} else {
-		print "An unknown error occurred:\n";
-		print $result->status_line, "\n";
-		exit;
-	}
->>>>>>> Further simplifications.
 }
 
 sub _get_user_agent {
